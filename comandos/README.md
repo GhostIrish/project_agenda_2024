@@ -19,4 +19,5 @@ nao ta com todas as configs no .vscode
             git init
             git add
             git commit -m 'Mensagem do commit'
+            git remote add origin URL_DO_GIT, cria o repositorio noo github
 '''
