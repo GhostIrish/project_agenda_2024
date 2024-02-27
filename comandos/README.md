@@ -21,3 +21,8 @@ nao ta com todas as configs no .vscode
             git commit -m 'Mensagem do commit'
             git remote add origin URL_DO_GIT, cria o repositorio noo github
 '''
+
+'''
+27.02.2024: python manage.py startapp contact(criei o app main na 
+            pasta  do projeto)
+            fui no arquivo settings do project e adicionei na lista de INSTALLED_APPS a linha 'contact', que faz com que o django reconheça o app que eu acabei de criar, evitando erros!
