@@ -703,7 +703,85 @@ POIS AS VEZES O SERVER DA ERRO POR ESSE SIMPLES ATO DE NAO SALVAR
             def register(request):
                 return render(
                     request,
-                    'contact/register.html'
+                    'contact/register.html',
+                    {
+                        'form': form
+                    }
                 )
+            criamos um def(register) no user_forms para enviar e salvar o usuario no banco de dados caso o usuario seja validado, renderizando depois o form no render.
+
+            - agora vamos modificar o register form para acrescentar nos campos ja padroes, o campo de primeiro e ultimo nome e o email do usuario.
+            fizemos o mesmo processo parecido com todos os outros, importamos o model, ditamos os campos que queremos e sera exibido no register,
+            o django ja faz a validação do usuario automaticamente verificando se são iguais ou não, mas o e-mail ele desconsidera, oque faremos é configurar
+            par que o django não aceite dois usuarios com o mesmo e-mail.
+            o novo ficou assim:
+            class RegisterForm(UserCreationForm):
+                first_name = forms.CharField(
+                    required=True
+                )
+                
+                email = forms.EmailField(
+                    required=True
+                )
+                class Meta:
+                    model = User
+                    fields = (
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'username',
+                        'password1',
+                        'password2',
+                    )
+                
+                def clean_email(self):
+                    email = self.cleaned_data.get('email')
+                    
+                    if User.objects.filter(email=email).exists():
+                        self.add_error(
+                            'email',
+                            ValidationError('Another user is registered with this email.', code='invalid')
+                        )
+                    return email
+                        
+            onde o começo ali ate antes do classe meta é para trabalhar no campo first_name e email, eu escolhi eles so, para obrigar o usuario a ter que ter pelo menos
+            o email e o primeiro nome escrito, não é obrigatório ter um segundo nomes.
+            a parte do meta eu ja te expliquei mais ou menos antes que é como os outros.
+            e o clean email ali é para verificar se ja não ha algum usuario com este meesmo email cadastrado, caso haja, ele não salva o usuario e dispara aquele erro ali
+            ate um email valido ser digitado.
+
+22.03.2024: nesse video vamos aprender a fazer as messages, por exemplo quando um usuario conseguir salvar um contato, ira disparar o sucess.
+
+25.03.2024: Hoje vamos fazer o sistema de login e logout  do usuário separamos o forms que estava no register e criamos um partials para ele,
+            ja que o forms podera ser usado mais vezes, colamos la e fazemos o include do forms no register novamente para ele voltar a fun-
+            cionar.
+            - criamos um html para login, fazemos o include igual no register, mudando apenas a header de register para login, agora vamos
+            criar uma view para esse login.
+
+
+26.03.2024: Hoje vou focar em fazer a parte que permite ao usuário editar as informações do contato, com uma view específica e tudo mais.
+            criamos o form para isso no forms, o form é o RegisterUpdateForm.
+            - Lembre-se de estar logado para fazer isso, pois essas ações posteriormente serão obrigatórias estar logado para realizá-las.
+            colocamos o url desse form, depois vamos criar a view para ela poder ser buscada pela url, ai vamos no user_forms pra isso.
+            - Criamos a view que inicialmente ficará assim:
+            def user_update(request):
+                form = RegisterUpdateForm(istance=request.user)
+                
+                return render(
+                    request,
+                    'contact/register.html',
+                    {
+                        'form': form
+                    }
+                )
+            isso é suficiente para o site funcionar nessa parte de update, criamos mais coisas para verificar se o método do formulario for post, ou seja, para enviar
+            dados, caso seja e caso o formulário atenda todas as requisições impostas, o usuário é salvo.
+            - atualizei o user_update para ter maior ligação com o RegisterUpdateForm, eles juntos fazem o trabalho de possibilitar alterar as informações do usuario,
+            com essas alterações até agora ja é possivel alterar os nomes, email, verificar se o email novo que esta colocando ja esta cadastrado, so falta a validação
+            e confirmação de alteração de senha, que estou fazendo no momento.
+            - fizemos tudo no forms, fizemos o processo de validação de senha do usuario para poder alterá-la, agora é possivel, foi tudo feito pelo forms, em caso de
+            duvida, verifique a aula 493 do curso, sobrescrevemos a função save do django para salvar de forma específica que precisamos no validate do user, salvando
+            apenas caso as condições da senha sejam atendidas.
+            - fizemos com que atualizasse a pagina, caso o formulario de alteração seja valido, você é redirecionado para a pagina novamente, mostrando as alterações feitas.
             
-            
+            - Agora vamos fazer um processo para diferenciar os usuarios logados dos não logados.

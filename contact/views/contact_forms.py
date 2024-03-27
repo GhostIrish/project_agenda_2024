@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from contact.forms import ContactForm
 from contact.models import Contact
 from django.urls import reverse
+from django.contrib import messages
 # Create your views here.
     
 def create(request):  
@@ -14,9 +15,10 @@ def create(request):
         }
         
         if form.is_valid():
-            print('Your form has been validated.')
             contact = form.save()
-            return redirect('contact:update', contact_id=contact.pk)
+            messages.success(request, 'Contact created.')
+            return redirect('contact:index')
+            #return redirect('contact:update', contact_id=contact.pk)
         
         return render(
             request,
@@ -49,7 +51,7 @@ def update(request, contact_id):
         }
         
         if form.is_valid():
-            print('Your form has been validated.')
+            messages.success(request, 'Contact Updated')
             contact = form.save()
             return redirect('contact:update', contact_id=contact.pk)
         
@@ -77,6 +79,7 @@ def delete(request, contact_id):
     
     if confirmation == 'yes':
         contact.delete()
+        messages.success(request, 'Contact deleted')
         return redirect('contact:index')
     
     return render(
